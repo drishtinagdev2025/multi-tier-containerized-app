@@ -35,11 +35,10 @@ kind: Service
 metadata:
   name: fastapi-service
 spec:
-  type: NodePort
+  type: ClusterIP  # Changed from NodePort to ClusterIP
   selector:
     app: fastapi
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 8000
-      nodePort: 30080
+      port: 8000       # The port the Ingress will target
+      targetPort: 8000 # The port inside your container
