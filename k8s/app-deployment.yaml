@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+      - name: fastapi-app
+        image: local/fastapi-app:latest
+        imagePullPolicy: Never # Crucial for pointing to Minikube's internal Docker registry
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DB_HOST
+          value: postgres-service
+        - name: DB_NAME
+          value: mydatabase
+        - name: DB_USER
+          value: dbuser
+        - name: DB_PASSWORD
+          value: dbpassword
+        - name: REDIS_HOST
+          value: redis-service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-service
+spec:
+  type: NodePort
+  selector:
+    app: fastapi
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30080
