@@ -15,7 +15,7 @@ spec:
       containers:
       - name: fastapi-app
         image: local/fastapi-app:latest
-        imagePullPolicy: Never # Crucial for pointing to Minikube's internal Docker registry
+        imagePullPolicy: Never
         ports:
         - containerPort: 8000
         env:
@@ -29,6 +29,24 @@ spec:
           value: dbpassword
         - name: REDIS_HOST
           value: redis-service
+        
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5  # Wait 5 seconds before checking (gives FastAPI time to start)
+          periodSeconds: 10       # Check every 10 seconds
+          timeoutSeconds: 3       # Consider a timeout a failure after 3 seconds
+          failureThreshold: 3     # Restart pod after 3 consecutive failures
+          
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+          initialDelaySeconds: 5  # Wait before directing traffic to the pod
+          periodSeconds: 5        # Check frequently during traffic routing
+          timeoutSeconds: 3       
+          failureThreshold: 2     # Remove pod from Ingress pool after 2 consecutive failures
 ---
 apiVersion: v1
 kind: Service

@@ -3,7 +3,8 @@ kind: Ingress
 metadata:
   name: fastapi-ingress
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx  
   rules:
